@@ -12,7 +12,6 @@ WORKDIR /app
 # Set production environment
 ENV NODE_ENV=production
 
-
 # Throw-away build stage to reduce size of final image
 FROM base as build
 
@@ -20,25 +19,24 @@ FROM base as build
 RUN apt-get update -qq && \
     apt-get install -y python-is-python3 pkg-config build-essential 
 
+# Install performant npm
+RUN npm install -g pnpm
+
 # Install node modules
 COPY --link package.json .
-RUN npm install --production=false
+RUN pnpm install
 
 # Copy application code
 COPY --link . .
 
 # Build application
-RUN npm run build
-
-# Remove development dependencies
-RUN npm prune --production
-
+RUN pnpm run build
 
 # Final stage for app image
 FROM base
 
 # Copy built application
-COPY --from=build /app /app
+COPY --from=build /app/build /app/build
 
 # Start the server by default, this can be overwritten at runtime
-CMD [ "npm", "run", "start" ]
+CMD [ "node", "./build" ]
