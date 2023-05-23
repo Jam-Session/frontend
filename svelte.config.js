@@ -11,10 +11,7 @@ const config = {
   }),
 
 	kit: {
-		adapter: adapter(),
-		paths: {
-			base: '/dan-harris'
-		}
+		adapter: adapter()
 	}
 };
 
