@@ -14,15 +14,13 @@ jobs:
         with:
           run_install: true
 
-  check:
-    name: lint & typecheck
+  typecheck:
     needs: install
     runs-on: ubuntu-latest
     steps: 
       - run: pnpm run check
 
   test:
-    name: unit tests
     needs: install
     runs-on: ubuntu-latest
     steps:
