@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  install:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -13,16 +13,10 @@ jobs:
       - uses: pnpm/action-setup@v2.2.4
         with:
           run_install: true
-
-  typecheck:
-    needs: install
-    runs-on: ubuntu-latest
-    steps: 
-      - run: pnpm run check
-
-  test:
-    needs: install
-    runs-on: ubuntu-latest
-    steps:
-      - run: pnpm run test --run
+  
+      - name: typecheck
+        run: pnpm run check
+  
+      - name: test run
+        run: pnpm run test --run
   
