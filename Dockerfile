@@ -9,9 +9,6 @@ LABEL fly_launch_runtime="NodeJS"
 # NodeJS app lives here
 WORKDIR /app
 
-# Set production environment
-ENV NODE_ENV=production
-
 # Throw-away build stage to reduce size of final image
 FROM base as build
 
@@ -24,7 +21,8 @@ RUN npm install -g pnpm
 
 # Install node modules
 COPY --link package.json .
-RUN pnpm install
+COPY --link pnpm-lock.yaml .
+RUN pnpm install --frozen-lockfile
 
 # Copy application code
 COPY --link . .
@@ -34,6 +32,9 @@ RUN pnpm run build
 
 # Final stage for app image
 FROM base
+
+# Set production environment
+ENV NODE_ENV=production
 
 # Copy built application
 COPY --from=build /app/build /app/build
