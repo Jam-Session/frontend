@@ -48,10 +48,7 @@ class Chatbot {
 		}
 		const data = await resp.text();
 		const SNlM0e = data.match(/"SNlM0e":"(.*?)"/);
-		if (!SNlM0e) {
-			throw new Error('Could not parse SNlM0e');
-		}
-		return SNlM0e[1];
+		return SNlM0e ? SNlM0e[1] : '';
 	}
 
 	async ask(message: string) {
@@ -70,6 +67,11 @@ class Chatbot {
 		// message arr -> data["f.req"]. Message is double json stringified
 		const messageStruct = [[message], null, [this.conversationId, this.responseId, this.choiceId]];
 		const SNlM0e = await this.__getSnlm0e();
+
+		if (!SNlM0e) {
+			throw new Error('Could not parse SNlM0e');
+		}
+
 		const data = {
 			'f.req': JSON.stringify([null, JSON.stringify(messageStruct)]),
 			at: SNlM0e
