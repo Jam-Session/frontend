@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import makeLocalStore from '$lib/makeLocalStore';
-	import { afterUpdate } from 'svelte';
 	import type { ActionData, SubmitFunction } from './$types';
 
 	const psid = makeLocalStore('PSID', '');
@@ -16,12 +15,9 @@
 		return async ({ update }) => {
 			loading = false;
 			await update();
+			setTimeout(() => promptRef?.select(), 1);
 		};
 	};
-
-	afterUpdate(() => {
-		setTimeout(() => promptRef?.select(), 1);
-	});
 </script>
 
 <div class="container p-4">
