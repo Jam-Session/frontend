@@ -9,12 +9,12 @@ const USER_AGENT =
 const BARD_MODEL = 'boq_assistant-bard-web-server_20230419.00_p1';
 
 class Chatbot {
-	init: RequestInit;
-	_reqid: number;
-	conversationId: string;
-	responseId: string;
-	choiceId: string;
-	SNlM0e: Promise<string>;
+	private init: RequestInit;
+	private _reqid: number;
+	public conversationId?: string;
+	public responseId?: string;
+	public choiceId?: string;
+	private SNlM0e: Promise<string>;
 
 	/**
 	 * A class to interact with Google Bard.
@@ -22,9 +22,6 @@ class Chatbot {
 	 */
 	constructor(sessionId: string) {
 		this._reqid = random.int(0, 9999);
-		this.conversationId = '';
-		this.responseId = '';
-		this.choiceId = '';
 
 		this.init = {
 			headers: {
@@ -65,16 +62,14 @@ class Chatbot {
 		});
 
 		// message arr -> data["f.req"]. Message is double json stringified
-		const messageStruct = [[message], null, [this.conversationId, this.responseId, this.choiceId]];
-		const SNlM0e = await this.__getSnlm0e();
-
-		if (!SNlM0e) {
-			throw new Error('Could not parse SNlM0e');
-		}
-
+		const messageStruct = [
+			[message],
+			null,
+			[this.conversationId || '', this.responseId || '', this.choiceId || '']
+		];
 		const data = {
 			'f.req': JSON.stringify([null, JSON.stringify(messageStruct)]),
-			at: SNlM0e
+			at: await this.SNlM0e
 		};
 
 		// do the request!
@@ -101,7 +96,7 @@ class Chatbot {
 		};
 		this.conversationId = results.conversationId;
 		this.responseId = results.responseId;
-		this.choiceId = results.choices[0]?.id || "";
+		this.choiceId = results.choices[0]?.id;
 		this._reqid += 100000;
 		return results;
 	}

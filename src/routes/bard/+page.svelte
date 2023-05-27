@@ -28,7 +28,10 @@
 			{#if form}
 				<code class="code">{$psid}</code>
 				<input type="hidden" name="token" value={$psid} />
-			{:else}
+				<input type="hidden" name="conversationId" value={form.conversationId} />
+				<input type="hidden" name="responseId" value={form.responseId} />
+				<input type="hidden" name="choiceId" value={form.choiceId} />
+				{:else}
 				<input type="password" name="token" bind:value={$psid} required autocomplete="off" />
 			{/if}
 		</label>
