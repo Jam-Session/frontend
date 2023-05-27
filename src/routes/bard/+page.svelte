@@ -1,26 +1,62 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import type { ActionData } from './$types';
+	import makeLocalStore from '$lib/makeLocalStore';
+	import { afterUpdate, tick } from 'svelte';
+	import type { ActionData, SubmitFunction } from './$types';
+
+	const psid = makeLocalStore('PSID', '');
 
 	export let form: ActionData;
+
+	let loading = false;
+	let promptRef: HTMLInputElement;
+
+	const submitFn: SubmitFunction = function (input) {
+		loading = true;
+		return async ({ update }) => {
+			loading = false;
+			await update();
+		};
+	};
+
+	afterUpdate(() => {
+		setTimeout(() => promptRef?.select(), 1);
+	});
 </script>
 
-<div class="my-4 container bg-blue-100 p-4">
-	<form method="POST" use:enhance class="space-y-4">
-		{#if form?.error}
-			<p class="variant-filled-surface p-1 rounded">{form?.error}</p>
-		{/if}
-
+<div class="container p-4">
+	<form use:enhance={submitFn} method="POST" class="space-y-4">
 		<label>
 			<div>1PSID</div>
-			<input type="password" name="token" required />
+			{#if form}
+				<code>{$psid}</code>
+				<input type="hidden" name="token" value={$psid} />
+			{:else}
+				<input type="password" name="token" bind:value={$psid} required autocomplete="off" />
+			{/if}
 		</label>
 
-		<label>
-			<div>Prompt</div>
-			<textarea name="prompt" class="w-full" required value={form?.textQuery ?? ''} />
-		</label>
+		{#if !loading}
+			{#if form?.error}
+				<p class="variant-ghost-surface p-1 rounded">{form?.error}</p>
+			{/if}
 
-		<button type="submit" class="btn variant-filled-primary">Submit</button>
+			{#if form?.content}
+				<pre>{form?.content}</pre>
+			{/if}
+		{/if}
+
+		<div class="flex items-end gap-4">
+			<label class="flex-1">
+				<div>Prompt</div>
+				<input type="text" class="w-full" name="prompt" required bind:this={promptRef} />
+			</label>
+
+			<button type="submit" class="btn variant-filled-primary" disabled={loading}>Submit</button>
+		</div>
+
+		{#if loading}
+			<p class="animate-pulse">Loading...</p>
+		{/if}
 	</form>
 </div>

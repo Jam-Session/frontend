@@ -6,9 +6,8 @@ export const actions: Actions = {
     const data = await request.formData();
     try {
       const bot = new Chatbot(String(data.get('token')));
-      const result = await bot.ask(String(data.get('prompt')));
-      return result;
-  
+      const { content } = await bot.ask(String(data.get('prompt')));
+      return { content: String(content) };
     }
     catch(e) {
       return fail(500, { error: String(e) });
