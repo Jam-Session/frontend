@@ -10,7 +10,7 @@
 	let loading = false;
 	let promptRef: HTMLInputElement;
 
-	const submitFn: SubmitFunction = function (input) {
+	const submitFn: SubmitFunction = function () {
 		loading = true;
 		return async ({ update }) => {
 			loading = false;
