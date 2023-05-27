@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import makeLocalStore from '$lib/makeLocalStore';
-	import { afterUpdate, tick } from 'svelte';
+	import { afterUpdate } from 'svelte';
 	import type { ActionData, SubmitFunction } from './$types';
 
 	const psid = makeLocalStore('PSID', '');
