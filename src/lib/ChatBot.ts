@@ -80,49 +80,26 @@ class Chatbot {
 			`${BASE_URL}/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate?${params}`,
 			{
 				...this.init,
-				headers: {
-					...this.init.headers,
-					'Content-Type': 'application/x-www-form-urlencoded'
-				},
 				method: 'POST',
 				body: new URLSearchParams(data).toString()
 			}
 		);
 
 		const toParse = await resp.text();
-
 		const chatData = JSON.parse(toParse.split('\n')[3])[0][2];
-		if (!chatData) {
-			return { content: `Google Bard encountered an error: ${toParse}.` };
-		}
 		const jsonChatData = JSON.parse(chatData);
-		// check if properties exist
-		if (
-			!jsonChatData[0] ||
-			!jsonChatData[1] ||
-			!jsonChatData[2] ||
-			!jsonChatData[3] ||
-			!jsonChatData[4]
-		) {
-			if (jsonChatData[0] && jsonChatData[0][0]) {
-				return { content: jsonChatData[0][0] };
-			} else {
-				return { content: `Google Bard encountered an error: ${toParse}.` };
-			}
-		}
+
 		const results = {
 			content: jsonChatData[0][0],
 			conversationId: jsonChatData[1][0],
 			responseId: jsonChatData[1][1],
 			factualityQueries: jsonChatData[3],
 			textQuery: jsonChatData[2][0] || '',
-			choices: jsonChatData[4].map((i) => ({ id: i[0], content: i[1] }))
+			choices: jsonChatData[4].map(([id, content]: unknown[]) => ({ id, content }))
 		};
 		this.conversationId = results.conversationId;
 		this.responseId = results.responseId;
-		// choiseId might be undefined
-
-		this.choiceId = results.choices[0]?.id || "Google Bard couldn't answer this question.";
+		this.choiceId = results.choices[0]?.id || "";
 		this._reqid += 100000;
 		return results;
 	}
