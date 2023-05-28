@@ -43,7 +43,7 @@
 
 			{#if form?.content}
 				<article class="prose rounded variant-ringed-success p-2">
-					{@html marked(form.content)}
+					{@html marked(form.content, { mangle: false, headerIds: false })}
 				</article>
 			{/if}
 		{/if}
