@@ -87,24 +87,19 @@ class Chatbot {
 		const jsonChatData = JSON.parse(chatData);
 		const content = jsonChatData[0][0];
 
-		try {
-			const results = {
-				content,
-				conversationId: jsonChatData[1][0],
-				responseId: jsonChatData[1][1],
-				factualityQueries: jsonChatData[3],
-				textQuery: (jsonChatData[2]??[0]) || '',
-				choices: (jsonChatData[4] || []).map(([id, content]: unknown[]) => ({ id, content }))
-			};
-			this.conversationId = results.conversationId;
-			this.responseId = results.responseId;
-			this.choiceId = results.choices && results.choices[0]?.id;
-			this._reqid += 100000;
-			return results;
-		} catch (e) {
-			console.error(toParse);
-			return { content };
-		}
+		const results = {
+			content,
+			conversationId: jsonChatData[1][0],
+			responseId: jsonChatData[1][1],
+			factualityQueries: jsonChatData[3],
+			textQuery: (jsonChatData[2]??[0]) || '',
+			choices: (jsonChatData[4] || []).map(([id, content]: unknown[]) => ({ id, content }))
+		};
+		this.conversationId = results.conversationId;
+		this.responseId = results.responseId;
+		this.choiceId = results.choices && results.choices[0]?.id;
+		this._reqid += 100000;
+		return results;
 	}
 }
 export default Chatbot;
