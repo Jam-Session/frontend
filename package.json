@@ -1,6 +1,6 @@
 {
 	"name": "jam-session",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -19,8 +19,8 @@
 		"@tailwindcss/forms": "^0.5.3",
 		"@tailwindcss/typography": "^0.5.9",
 		"@types/marked": "^5.0.0",
-		"@typescript-eslint/eslint-plugin": "^5.59.8",
-		"@typescript-eslint/parser": "^5.59.8",
+		"@typescript-eslint/eslint-plugin": "^5.59.9",
+		"@typescript-eslint/parser": "^5.59.9",
 		"autoprefixer": "^10.4.14",
 		"clsx": "^1.2.1",
 		"eslint": "^8.42.0",
