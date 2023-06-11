@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 	import { addSeconds, format } from 'date-fns';
-	import DefList from '$lib/DefList.svelte';
+	import Chart from './Chart.svelte';
 
 	export let data: PageData;
 	let index = 0;
@@ -20,21 +20,14 @@
 			else {
 				clearInterval(interval);
 			}
-		}, 200);
+		}, 500);
 		return () => clearInterval(interval);
 	});
 
 	$: candles = data.ohlc.slice(0, index + 1);
 </script>
 
-<div class="container p-4">
-	<p class="chip variant-ringed mb-4">{format(when, 'PPppp')}</p>
-	<ol class="flex flex-wrap gap-2">
-		{#each candles as { time, ...ohlc }}
-			<li class="variant-ringed p-2 rounded">
-				<h6 class="border-b border-surface-500 text-center mb-2">{format(time, 'pp')}</h6>
-				<DefList obj={ohlc} />
-			</li>
-		{/each}
-	</ol>
+<div class="container p-4 flex flex-col gap-4 items-start">
+	<p class="badge variant-filled-primary">{format(when, 'PPppp')}</p>
+	<Chart candles={candles} />
 </div>
