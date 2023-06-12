@@ -42,11 +42,6 @@ ENV NODE_ENV=production
 
 # Copy built application
 COPY --from=build /app/build /app/build
-COPY --from=build /app/package.json /app/package.json
-
-# Generate prisma client
-COPY --from=build /app/prisma/schema.prisma /app/prisma/schema.prisma
-RUN npx prisma generate
 
 # Start the server by default, this can be overwritten at runtime
 CMD [ "node", "/app/build" ]
