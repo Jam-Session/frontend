@@ -40,9 +40,5 @@ ENV NODE_ENV=production
 COPY --from=build /app/package.json /app/package.json
 COPY --from=build /app/build /app/build
 
-# Copy local database
-COPY prisma/local.db /app/local.db
-ENV DATABASE_URL="file:/app/local.db"
-
 # Start the server by default, this can be overwritten at runtime
 CMD [ "node", "/app/build" ]
