@@ -1,17 +1,16 @@
 <script lang="ts">
-	import type { OHLC } from '$lib/ohlc';
 	import { onMount } from 'svelte';
 	import {
 		createChart,
-		type CandlestickData,
 		type ISeriesApi,
 		type UTCTimestamp,
 		type IChartApi
 	} from 'lightweight-charts';
 	import { browser } from '$app/environment';
 	import { format, fromUnixTime, getUnixTime } from 'date-fns';
+	import type { Price } from '@prisma/client';
 
-	export let candles: OHLC[];
+	export let candles: Price[];
 
 	let el: HTMLObjectElement;
 	let chart: IChartApi;
@@ -46,7 +45,7 @@
 		});
 	}
 
-	function update(d: OHLC[]) {
+	function update(d: Price[]) {
 		if (series) {
 			series.setData(
 				d.map((c) => ({

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { PageData } from './$types';
 	import { addSeconds, format } from 'date-fns';
 	import Chart from './Chart.svelte';
 
-	export let data: PageData;
+	export let data;
+
 	let index = 0;
 	let when = new Date(data.ohlc[index].time);
 
