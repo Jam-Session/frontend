@@ -27,6 +27,11 @@ RUN pnpm install --frozen-lockfile
 # Copy application code
 COPY --link . .
 
+# Create/Update/Seed DB
+ENV DATABASE_URL="file:/data/prices.db"
+RUN pnpm prisma migrate deploy
+RUN pnpm prisma db seed
+
 # Build application
 RUN pnpm run build
 

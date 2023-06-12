@@ -3,4 +3,9 @@ Dockerfile
 .dockerignore
 node_modules
 .git
-prisma/
+.github
+.svelte-kit
+.vscode
+build
+prisma/local.db
+.env
