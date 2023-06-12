@@ -8,4 +8,5 @@ node_modules
 .vscode
 build
 prisma/local.db
+prisma/seed
 .env

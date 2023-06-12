@@ -3,8 +3,9 @@
 	"version": "0.2.3",
 	"private": true,
 	"scripts": {
-		"dev": "vite dev",
-		"build": "prisma generate && vite build",
+		"postinstall": "prisma generate",
+		"dev": "svelte-kit sync && vite dev",
+		"build": "svelte-kit sync && vite build",
 		"prisma": "prisma",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -17,6 +18,7 @@
 	},
 	"packageManager": "pnpm@8.6.1",
 	"devDependencies": {
+		"@prisma/client": "4.15.0",
 		"@skeletonlabs/skeleton": "^1.7.1",
 		"@sveltejs/adapter-node": "^1.2.4",
 		"@sveltejs/kit": "^1.20.2",
@@ -24,8 +26,8 @@
 		"@tailwindcss/typography": "^0.5.9",
 		"@types/marked": "^5.0.0",
 		"@types/node": "20.3.0",
-		"@typescript-eslint/eslint-plugin": "^5.59.9",
-		"@typescript-eslint/parser": "^5.59.9",
+		"@typescript-eslint/eslint-plugin": "^5.59.10",
+		"@typescript-eslint/parser": "^5.59.10",
 		"autoprefixer": "^10.4.14",
 		"clsx": "^1.2.1",
 		"date-fns": "^2.30.0",
@@ -47,8 +49,5 @@
 		"vite": "^4.3.9",
 		"vitest": "^0.31.4"
 	},
-	"type": "module",
-	"dependencies": {
-		"@prisma/client": "4.15.0"
-	}
+	"type": "module"
 }

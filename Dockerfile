@@ -29,8 +29,8 @@ COPY --link . .
 
 # Create/Update/Seed DB
 ENV DATABASE_URL="file:/data/prices.db"
+RUN pnpm prisma generate
 RUN pnpm prisma migrate deploy
-RUN pnpm prisma db seed
 
 # Build application
 RUN pnpm run build
