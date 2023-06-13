@@ -1,18 +1,18 @@
-import fs from 'fs';
 import zlib from 'zlib';
+import { pipeline } from 'stream';
 import { parseISO } from 'date-fns';
 
-export function seed(prisma) {
-	const url = new URL(`ohlc.csv.gz`, import.meta.url);
-	const fileContents = fs.createReadStream(url);
+export async function seed(prisma) {
+	const response = await fetch(
+		'https://github.com/Jam-Session/frontend/raw/582fa97c11c51df9d4d72e74fed23d6f3b0a0451/prisma/seed/ohlc.csv.gz'
+	);
 	const unzip = zlib.createGunzip();
 
 	let partial = '';
 	let lastClose = 0;
 	const data = [];
 
-	fileContents
-		.pipe(unzip)
+	pipeline(response.body, unzip, err => err && console.error(err))
 		.on('data', (d) => {
 			d.toString()
 				.split('\n')

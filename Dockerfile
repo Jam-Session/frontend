@@ -8,6 +8,8 @@ LABEL fly_launch_runtime="NodeJS"
 
 # NodeJS app lives here
 WORKDIR /app
+# Sqlite data lives there
+ENV DATABASE_URL="file:/data/prices.db"
 
 # Throw-away build stage to reduce size of final image
 FROM base as build
@@ -28,8 +30,8 @@ RUN pnpm install --frozen-lockfile
 COPY --link . .
 
 # Create/Update/Seed DB
-ENV DATABASE_URL="file:/data/prices.db"
-RUN pnpm prisma migrate deploy
+RUN pnpm run prisma migrate deploy
+RUN pnpm run prisma db seed
 
 # Build application
 RUN pnpm run build
@@ -43,7 +45,10 @@ ENV NODE_ENV=production
 # Copy built application
 COPY --from=build /app/build /app/build
 COPY --from=build /app/package.json /app/package.json
-COPY --from=build /app/prisma/schema.prisma /app/build/prisma/schema.prisma
+
+# Copy prisma stuff
+COPY --from=build /app/prisma/schema.prisma /app/build/server/chunks/schema.prisma
+COPY --from=build /app/node_modules/prisma /tmp/prisma-engines
 
 # Start the server by default, this can be overwritten at runtime
 CMD [ "node", "/app/build" ]
