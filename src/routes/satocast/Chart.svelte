@@ -44,8 +44,9 @@
 	}
 
 	function update(d: typeof data) {
-		if (series) {
-			series.update(d[d.length-1]);
+		const latest = d.at(-1);
+		if (series && latest) {
+			series.update(latest);
 			chart.timeScale().fitContent();
 		}
 	}

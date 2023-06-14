@@ -27,20 +27,14 @@
 			} else {
 				clearInterval(interval);
 			}
-		}, 100);
+		}, 50);
 		return () => clearInterval(interval);
 	});
 
-	$: candlesticks = data.bars.reduce<CandlestickData[]>((memo, bar) => {
+	$: candlesticks = data.bars.reduce<CandlestickData[]>((memo, bar, index) => {
 			const time = getUnixTime(bar.start) as UTCTimestamp;
-			let prices = bar.prices;
-			if (!isBefore(bar.start, when)) {
-				if (isSameHour(when, bar.start)) {
-					prices = prices.slice(0, getMinutes(when)+1);
-				} else {
-					return [...memo];
-				}
-			}
+			if(index > hour) return memo;
+			const prices = bar.prices.slice(0, isSameHour(when, bar.start) ? getMinutes(when)+1 : undefined);
 			return [
 				...memo,
 				{
@@ -52,12 +46,10 @@
 				}
 			];
 		}, []);
-
-		$: console.log(candlesticks.at(-1)?.close);
 </script>
 
 <div class="container p-4 flex flex-col gap-4 items-start">
 	<p class="badge variant-filled-primary">{format(when, 'PPppp')}</p>
-	<progress max={data.bars.length - 1} value={hour} />
+	<progress max={(data.bars.length - 1)*60} value={(hour*60)+getMinutes(when)} />
 	<Chart data={candlesticks} />
 </div>
