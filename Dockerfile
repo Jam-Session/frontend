@@ -30,6 +30,7 @@ RUN pnpm install --frozen-lockfile
 COPY --link . .
 
 # Create/Update/Seed DB
+RUN pnpm run prisma generate
 RUN pnpm run prisma migrate deploy
 RUN pnpm run prisma db seed
 

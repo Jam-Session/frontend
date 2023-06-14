@@ -10,12 +10,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Price {
+model Candle {
   time      DateTime   @id
-  open      Float?
-  high      Float?
-  low       Float?
-  close     Float
+  prices    String
 }
 
 

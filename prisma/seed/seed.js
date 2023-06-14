@@ -1,18 +1,30 @@
 import zlib from 'zlib';
+import fs from 'fs';
 import { pipeline } from 'stream';
-import { parseISO } from 'date-fns';
+import { getMinutes, parseISO } from 'date-fns';
 
 export async function seed(prisma) {
-	const response = await fetch(
-		'https://github.com/Jam-Session/frontend/raw/582fa97c11c51df9d4d72e74fed23d6f3b0a0451/prisma/seed/ohlc.csv.gz'
-	);
+	let source;
+	try {
+		const url = new URL('ohlc.csv.gz', import.meta.url);
+		fs.statSync(url);
+		console.log('Parsing local file...');
+		source = fs.createReadStream(url);
+	} catch (e) {
+		console.log('Fetching data from GitHub...');
+		const response = await fetch(
+			'https://github.com/Jam-Session/frontend/raw/582fa97c11c51df9d4d72e74fed23d6f3b0a0451/prisma/seed/ohlc.csv.gz'
+		);
+		console.log(response.status, response.statusText);
+		source = response.body;
+	}
+
 	const unzip = zlib.createGunzip();
 
 	let partial = '';
-	let lastClose = 0;
 	const data = [];
 
-	pipeline(response.body, unzip, err => err && console.error(err))
+	pipeline(source, unzip, (err) => err && console.error(err))
 		.on('data', (d) => {
 			d.toString()
 				.split('\n')
@@ -33,21 +45,49 @@ export async function seed(prisma) {
 					const time = parseISO(`${datestr}Z`);
 					const [open, close, low, high] = values.map((s) => (s ? parseFloat(s) : null));
 
-					if (open && close) {
-						lastClose = close || 0;
-					}
-
-					data.push({ time, open, high, low, close: close || lastClose });
+					data.push({ time, open, close, low, high });
 				});
 		})
 		.on('finish', async () => {
-			console.log(`Adding ${data.length} datapoints`);
+			console.log(`Parsed ${data.length} datapoints`);
+
+			let candles = 0;
+			let prices = [];
+			let hour;
+			let n = 0;
 			for (let i = 0; i < data.length; i++) {
-				const { time, close } = data[i];
-				await prisma.price.create({ data: data[i] });
-				if (i % 10000 === 0) {
-					console.log(time, close, `${((i / data.length) * 100).toPrecision(3)}%`);
+				const { time, open } = data[i];
+
+				if (getMinutes(time)) {
+					prices.push(open);
+				} else {
+					// top of the hour
+					if (hour) {
+						const update = {
+							time: hour,
+							prices: JSON.stringify(prices)
+						};
+						await prisma.candle.upsert({
+							where: {
+								time: hour,
+							},
+							update,
+							create: update,
+						});
+						candles++;
+					}
+					hour = time;
+					prices = [open];
+				}
+
+				const p = Math.floor(i / (data.length - 1) * 100);
+				if (p > n) {
+					if(p%10 === 0) {
+						console.log(`Progress: ${p}% ${Array(p/5).fill('.').join('')}`);
+					}
+					n++;
 				}
 			}
+			console.log(`Total: ${candles} candles`);
 		});
 }

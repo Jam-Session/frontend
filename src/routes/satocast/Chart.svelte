@@ -4,13 +4,13 @@
 		createChart,
 		type ISeriesApi,
 		type UTCTimestamp,
-		type IChartApi
+		type IChartApi,
+		type CandlestickData
 	} from 'lightweight-charts';
 	import { browser } from '$app/environment';
 	import { format, fromUnixTime, getUnixTime } from 'date-fns';
-	import type { Price } from '@prisma/client';
 
-	export let candles: Price[];
+	export let data: CandlestickData[];
 
 	let el: HTMLObjectElement;
 	let chart: IChartApi;
@@ -38,26 +38,19 @@
 					}
 				}
 			});
-			series = chart.addCandlestickSeries({
-				priceFormat: { minMove: 1 },
-			});
-			update(candles);
+			series = chart.addCandlestickSeries();
+			series.setData(data);
 		});
 	}
 
-	function update(d: Price[]) {
+	function update(d: typeof data) {
 		if (series) {
-			series.setData(
-				d.map((c) => ({
-					...c,
-					time: getUnixTime(c.time) as UTCTimestamp
-				}))
-			);
+			series.update(d[d.length-1]);
 			chart.timeScale().fitContent();
 		}
 	}
 
-	$: update(candles);
+	$: update(data);
 </script>
 
 <object aria-label="Chart" bind:this={el} class="h-[50vh] w-full" />
