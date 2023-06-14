@@ -63,16 +63,15 @@ export async function seed(prisma) {
 				} else {
 					// top of the hour
 					if (hour) {
-						const update = {
-							time: hour,
-							prices: JSON.stringify(prices)
-						};
 						await prisma.candle.upsert({
 							where: {
 								time: hour,
 							},
-							update,
-							create: update,
+							update: {},
+							create: {
+								time: hour,
+								prices: JSON.stringify(prices)
+							},
 						});
 						candles++;
 					}
