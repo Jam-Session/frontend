@@ -5,4 +5,11 @@ const prisma = new PrismaClient({
 	log: ['info', 'error', 'warn']
 });
 
-seed(prisma);
+prisma.candle.count().then(c => {
+	if(c) {
+		console.log(`Already have ${c} candles`)
+	}
+	else {
+		seed(prisma);
+	}
+})
