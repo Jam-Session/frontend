@@ -4,6 +4,12 @@ import { pipeline } from 'stream';
 import { getMinutes, parseISO } from 'date-fns';
 
 export async function seed(prisma) {
+	const c = await prisma.candle.count();
+	if(c) {
+		console.log(`Already have ${c} candles`);
+		return;
+	}
+
 	let source;
 	try {
 		const url = new URL('ohlc.csv.gz', import.meta.url);

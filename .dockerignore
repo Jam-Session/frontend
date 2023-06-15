@@ -8,5 +8,5 @@ node_modules
 .vscode
 build
 prisma/local*
-prisma/seed/*.gz
+**/seed/*.gz
 .env
