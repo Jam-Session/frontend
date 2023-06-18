@@ -1,55 +1,41 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import {
-		addMinutes,
-		format,
-		getMinutes,
-		getUnixTime,
-		isBefore,
-		isSameHour
-	} from 'date-fns';
-	import Chart from './Chart.svelte';
-	import type { CandlestickData, UTCTimestamp } from 'lightweight-charts';
-
+	import { page } from '$app/stores';
+	import Game from './Game.svelte';
+	import Usd from '$lib/Usd.svelte';
 	export let data;
 
-	let hour = 0;
-	let when = data.bars[hour].start;
+	$: type = $page.url.searchParams.get('type');
 
-	onMount(() => {
-		const interval = setInterval(() => {
-			const next = data.bars.at(hour + 1);
-			if (next) {
-				when = addMinutes(when, 5);
-				if (!isBefore(when, next.start)) {
-					hour += 1;
-				}
-			} else {
-				clearInterval(interval);
-			}
-		}, 10);
-		return () => clearInterval(interval);
+	const target = data.budget / data.average;
+
+	const { format } = new Intl.NumberFormat(undefined, {
+		style: 'currency',
+		currency: 'BTC',
+		currencyDisplay: 'name',
+		maximumSignificantDigits: 2
 	});
-
-	$: candlesticks = data.bars.reduce<CandlestickData[]>((memo, bar, index) => {
-			const time = getUnixTime(bar.start) as UTCTimestamp;
-			if(index > hour) return memo;
-			const prices = bar.prices.slice(0, isSameHour(when, bar.start) ? getMinutes(when)+1 : undefined);
-			return [
-				...memo,
-				{
-					time,
-					open: Number(prices.at(0)),
-					close: Number(prices.at(-1)),
-					high: Math.max(...prices),
-					low: Math.min(...prices)
-				}
-			];
-		}, []);
 </script>
 
-<div class="container p-4 flex flex-col gap-4 items-start">
-	<p class="badge variant-filled-primary">{format(when, 'PPppp')}</p>
-	<progress max={(data.bars.length - 1)*60} value={(hour*60)+getMinutes(when)} />
-	<Chart data={candlesticks} />
+<div class="container p-4 mx-auto">
+	{#if type}
+		<Game {data} {type} />
+	{:else}
+		<div class="flex flex-col gap-4 items-center">
+			<p>
+				Average price over {data.bars.length} hour period: <Usd value={data.average} />
+			</p>
+			<p>
+				With a budget of <Usd value={data.budget} />, target <strong>{format(target)}</strong>
+			</p>
+			<form class="flex gap-2">
+				<select name="type">
+					<option>DCA_HOURLY</option>
+					<option>LUMP_START</option>
+					<option>LUMP_END</option>
+				</select>
+
+				<button class="btn variant-filled-primary">Play</button>
+			</form>
+		</div>
+	{/if}
 </div>

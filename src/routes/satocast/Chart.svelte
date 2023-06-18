@@ -34,7 +34,7 @@
 				},
 				timeScale: {
 					tickMarkFormatter(t: UTCTimestamp) {
-						return format(fromUnixTime(t), 'ha MMM d');
+						return format(fromUnixTime(t), 'ha');
 					}
 				}
 			});
@@ -54,4 +54,4 @@
 	$: update(data);
 </script>
 
-<object aria-label="Chart" bind:this={el} class="h-[50vh] w-full" />
+<object aria-label="Chart" bind:this={el} class="h-[40dvh] w-full" />
