@@ -20,14 +20,14 @@
 		const interval = setInterval(() => {
 			const next = data.bars.at(hour + 1);
 			if (next) {
-				when = addMinutes(when, 1);
+				when = addMinutes(when, 5);
 				if (!isBefore(when, next.start)) {
 					hour += 1;
 				}
 			} else {
 				clearInterval(interval);
 			}
-		}, 50);
+		}, 10);
 		return () => clearInterval(interval);
 	});
 

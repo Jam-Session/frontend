@@ -2,7 +2,7 @@ import { prisma } from '$lib/db';
 import { subHours } from 'date-fns';
 import random from 'random';
 
-const BARS = 24; // one hour of data in each candle
+const BARS = 24*7; // one hour of data in each candle
 
 export async function load() {
 	const first = await prisma.candle.findFirstOrThrow({

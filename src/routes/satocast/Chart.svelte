@@ -34,7 +34,7 @@
 				},
 				timeScale: {
 					tickMarkFormatter(t: UTCTimestamp) {
-						return format(fromUnixTime(t), 'p');
+						return format(fromUnixTime(t), 'ha MMM d');
 					}
 				}
 			});
