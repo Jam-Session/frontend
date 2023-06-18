@@ -1,6 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { addMinutes, format, getMinutes, getUnixTime, isBefore, isEqual, isSameHour } from 'date-fns';
+	import {
+		addMinutes,
+		format,
+		getMinutes,
+		getUnixTime,
+		isBefore,
+		isEqual,
+		isSameHour
+	} from 'date-fns';
 	import Chart from './Chart.svelte';
 	import Player from './Player.svelte';
 	import type { CandlestickData, UTCTimestamp } from 'lightweight-charts';
@@ -9,15 +17,15 @@
 	export let data: PageData;
 	export let type: string;
 
-  const progressMax = (data.bars.length - 1) * 60;
-  const start = data.bars.at(0)?.start!;
+	const progressMax = (data.bars.length - 1) * 60;
+	const start = data.bars.at(0)?.start!;
 
-  const strategies = Object.entries({
-		LUMP_START: { buy(w: Date) { return isEqual(w, start); } },
-		LUMP_END: { buy(w: Date) { return isEqual(w, addMinutes(start, progressMax)); } },
-		DCA_HOURLY: { buy(w: Date) { return getMinutes(w) === 0; } }
-	}).reduce<Record<string, { name: string, buy: (w: Date)=> boolean }>>(
-		(a, [k, v]) => ({ ...a, [k]: { ...v, name: k } }),
+	const strategies = Object.entries({
+		LUMP_START: (w: Date) => (isEqual(w, start) ? 1 : 0),
+		LUMP_END: (w: Date) => (isEqual(w, addMinutes(start, progressMax)) ? 1 : 0),
+		DCA_HOURLY: (w: Date) => (getMinutes(w) === 0 ? 1 / data.bars.length : 0)
+	}).reduce<Record<string, { name: string; buy: (w: Date) => number }>>(
+		(a, [k, buy]) => ({ ...a, [k]: { buy, name: k } }),
 		{}
 	);
 
@@ -60,16 +68,23 @@
 		];
 	}, []);
 
-	$: progressVal = hour * 60 + getMinutes(when);
+	$: progress = (hour * 60 + getMinutes(when)) / progressMax;
 	$: price = candlesticks[candlesticks.length - 1].close;
+	$: gameOver = progress >= 1;
 </script>
 
-<div class="flex flex-col gap-4 items-start">
-	<p class="badge variant-filled-primary">{format(when, 'PPppp')}</p>
-	<progress max={progressMax} value={progressVal} />
+<div class="flex flex-col gap-4 items-center">
+	<p class={`badge ${gameOver ? 'variant-ringed-tertiary' : 'variant-filled-primary'}`}>
+		{format(when, 'PPppp')}
+	</p>
+	<progress value={progress} />
 	<Chart data={candlesticks} />
-  <div class="flex w-full gap-4">
-    <Player name={strategy.name} {price} {when} buy={strategy.buy} />
-    <Player name="You" {price} {when} />  
-  </div>
+	<div class="flex w-full gap-4">
+		<div class="flex-1">
+			<Player name={strategy.name} {price} {when} buy={strategy.buy} budget={data.budget} />
+		</div>
+		<div class="flex-1">
+			<Player name="Player" {price} {when} budget={data.budget} {gameOver} />
+		</div>
+	</div>
 </div>
