@@ -8,8 +8,6 @@ LABEL fly_launch_runtime="NodeJS"
 
 # NodeJS app lives here
 WORKDIR /app
-# Sqlite data lives there
-ENV DATABASE_URL="file:/data/prices.db"
 
 # Throw-away build stage to reduce size of final image
 FROM base as build
@@ -32,19 +30,8 @@ COPY --link . .
 # Build application
 RUN pnpm run build
 
-# Final stage for app image
-FROM base
-
 # Set production environment
 ENV NODE_ENV=production
-
-# Copy built application
-COPY --from=build /app/build /app/build
-COPY --from=build /app/package.json /app/package.json
-
-# Copy prisma stuff
-COPY --from=build /app/prisma/schema.prisma /app/build/server/chunks/schema.prisma
-COPY --from=build /app/node_modules/prisma /tmp/prisma-engines
 
 # Start the server by default, this can be overwritten at runtime
 CMD [ "node", "/app/build" ]

@@ -1,17 +1,18 @@
-# fly.toml app configuration file generated for jam-session on 2023-05-23T11:33:15-07:00
+# fly.toml app configuration file generated for adat on 2023-06-17T17:45:52-07:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "jam-session"
+app = "adat"
 primary_region = "sea"
 
 [env]
   PORT = "8080"
+  DATABASE_URL = "file:/data/prices.db"
 
-[mounts]
-  source="jamsqlite"
-  destination="/data"
+[[mounts]]
+  source = "jamsqlite"
+  destination = "/data"
 
 [http_service]
   internal_port = 8080
