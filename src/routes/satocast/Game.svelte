@@ -46,7 +46,7 @@
 			} else {
 				clearInterval(interval);
 			}
-		}, 20);
+		}, 42);
 		return () => clearInterval(interval);
 	});
 
@@ -85,7 +85,7 @@
 			{#if gameOver}
 				<p class="text-right">
 					<strong>GAME OVER!</strong>
-					<a href="/satocast">play again</a>
+					<a href="/satocast" class="anchor">try again</a>
 				</p>
 			{:else}
 				<progress value={progress} />
