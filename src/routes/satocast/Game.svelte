@@ -83,7 +83,10 @@
 		</div>
 		<div class="flex-1">
 			{#if gameOver}
-				<p class="text-right font-bold">GAME OVER!</p>
+				<p class="text-right">
+					<strong>GAME OVER!</strong>
+					<a href="/satocast">play again</a>
+				</p>
 			{:else}
 				<progress value={progress} />
 			{/if}
