@@ -3,6 +3,7 @@
 	import Usd from '$lib/Usd.svelte';
 	import { format, formatISO } from 'date-fns';
 	import { fade } from 'svelte/transition';
+	import BuyBtns from './BuyBtns.svelte';
 
 	export let name: string;
 	export let when: Date;
@@ -19,7 +20,6 @@
 
 	let purchases: Purchase[] = [];
 	let balance = budget;
-	let amount = budget / 10;
 
 	function doPurchase(usdAmount: number) {
 		if (balance > 0 && usdAmount <= balance) {
@@ -28,12 +28,7 @@
 				...purchases,
 				{ when, usdAmount, satAmount: Math.floor((usdAmount / price) * 1e8) }
 			];
-			amount = Math.min(balance, usdAmount);
 		}
-	}
-
-	function handleBuyClick() {
-		doPurchase(amount);
 	}
 
 	function maybeBuy(w: Date) {
@@ -52,40 +47,28 @@
 <section class="basis-1/2 flex flex-col items-start">
 	<h2 class="border-b w-full">{name}</h2>
 
-	<dl class="grid gap-x-2 grid-cols-[auto_1fr] items-baseline my-2">
-		<dt>Fiat balance:</dt>
-		<dd>
-			<span class="badge variant-glass-warning"><Usd value={balance} /></span>
-		</dd>
-		<dt>Amount stacked:</dt>
-		<dd>
-			<span class="badge variant-ringed"><Btc value={totalSats / 1e8} /></span>
-		</dd>
-		{#if !isNaN(average)}
-			<dt>Average paid:</dt>
+	<div class="flex my-2 gap-2 items-start justify-between w-full">
+		<dl class="grid gap-x-2 grid-cols-[auto_1fr] items-baseline">
+			<dt>Fiat balance:</dt>
 			<dd>
-				<span class="badge variant-filled-tertiary"><Usd value={average} /></span>
+				<span class="badge variant-glass-warning"><Usd value={balance} /></span>
 			</dd>
+			<dt>Amount stacked:</dt>
+			<dd>
+				<span class="badge variant-ringed"><Btc value={totalSats / 1e8} /></span>
+			</dd>
+			{#if !isNaN(average)}
+				<dt>Average paid:</dt>
+				<dd>
+					<span class="badge variant-filled-tertiary"><Usd value={average} /></span>
+				</dd>
+			{/if}
+		</dl>
+
+		{#if !buy && !gameOver}
+			<BuyBtns {doPurchase} {balance} />
 		{/if}
-	</dl>
-
-	{#if !buy && !gameOver}
-		<div class="flex flex-row-reverse gap-2 items-start justify-between mb-2 w-full">
-			<button class="btn variant-filled-secondary" on:click={handleBuyClick} disabled={balance <= 0}
-				>Buy</button
-			>
-
-			<label class="flex-1">
-				<span class="block text-xs">
-					<Usd value={amount} /> &approx; <Btc
-						value={amount / price}
-						options={{ maximumSignificantDigits: 4, minimumSignificantDigits: 4 }}
-					/>
-				</span>
-				<input type="range" min={1} max={balance} bind:value={amount} />
-			</label>
-		</div>
-	{/if}
+	</div>
 
 	<ol class="flex flex-col-reverse w-full text-xs font-mono whitespace-nowrap text-right">
 		{#each purchases as purchase}
@@ -96,13 +79,12 @@
 				>
 				<span class="flex-1 font-bold">
 					<span class="hidden md:inline font-normal"><Usd value={purchase.usdAmount} /> =</span>
-					<Btc value={btcAmount} options={{minimumFractionDigits: 8}} />
+					<Btc value={btcAmount} options={{ minimumFractionDigits: 8 }} />
 				</span>
 			</li>
 		{/each}
 	</ol>
 </section>
-
 
 <style lang="postcss">
 	dt {
