@@ -36,10 +36,6 @@
 		doPurchase(amount);
 	}
 
-	function scrollTo(el: HTMLElement) {
-		el.scrollIntoView();
-	}
-
 	function maybeBuy(w: Date) {
 		const a = buy ? buy(w) : 0;
 		if (a > 0) {
@@ -53,15 +49,30 @@
 	$: average = (budget - balance) / (totalSats / 1e8);
 </script>
 
-<section class="basis-1/2 flex flex-col items-center">
-	<h2 class="border-b mb-2 w-full">{name}</h2>
+<section class="basis-1/2 flex flex-col items-start">
+	<h2 class="border-b w-full">{name}</h2>
+
+	<dl class="grid gap-x-2 grid-cols-[auto_1fr] items-baseline my-2">
+		<dt>Fiat balance:</dt>
+		<dd>
+			<span class="badge variant-glass-warning"><Usd value={balance} /></span>
+		</dd>
+		<dt>Amount stacked:</dt>
+		<dd>
+			<span class="badge variant-ringed"><Btc value={totalSats / 1e8} /></span>
+		</dd>
+		{#if !isNaN(average)}
+			<dt>Average paid:</dt>
+			<dd>
+				<span class="badge variant-filled-tertiary"><Usd value={average} /></span>
+			</dd>
+		{/if}
+	</dl>
 
 	{#if !buy && !gameOver}
 		<div class="flex flex-row-reverse gap-2 items-start justify-between mb-2 w-full">
-			<button
-				class="btn variant-filled-secondary"
-				on:click={handleBuyClick}
-				disabled={balance <= 0}>Buy</button
+			<button class="btn variant-filled-secondary" on:click={handleBuyClick} disabled={balance <= 0}
+				>Buy</button
 			>
 
 			<label class="flex-1">
@@ -76,34 +87,25 @@
 		</div>
 	{/if}
 
-	<ol class="text-xs max-h-[20dvh] overflow-auto flex flex-col w-full">
+	<ol class="flex flex-col-reverse w-full text-xs font-mono whitespace-nowrap text-right">
 		{#each purchases as purchase}
-			<li class="variant-soft-surface p-2 mt-px sm:flex sm:items-center" use:scrollTo in:fade>
-				<span>
-					<Usd value={purchase.usdAmount} /> @
-					<time datetime={formatISO(purchase.when)}>{format(purchase.when, 'p')}</time>
+			{@const btcAmount = purchase.satAmount / 1e8}
+			<li class="variant-soft-surface px-1 gap-2 mb-px flex" in:fade>
+				<time datetime={formatISO(purchase.when)} class="basis-1/3 text-ellipsis overflow-hidden"
+					>{format(purchase.when, 'p')}</time
+				>
+				<span class="flex-1 font-bold">
+					<span class="hidden md:inline font-normal"><Usd value={purchase.usdAmount} /> =</span>
+					<Btc value={btcAmount} options={{minimumFractionDigits: 8}} />
 				</span>
-				<div class="sm:flex-1 sm:ml-2 text-right">
-					<Btc value={purchase.satAmount / 1e8} />
-				</div>
 			</li>
 		{/each}
 	</ol>
-
-	<dl class="w-full sm:w-auto sm:inline-grid grid-cols-2 my-2 items-baseline">
-		<dt class="text-xs">Fiat balance:</dt>
-		<dd class="text-right">
-			<span class="badge variant-glass-warning"><Usd value={balance} /></span>
-		</dd>
-		<dt class="text-xs mt-2">Amount stacked:</dt>
-		<dd class="text-right">
-			<span class="badge variant-ringed"><Btc value={totalSats / 1e8} /></span>
-		</dd>
-		{#if !isNaN(average)}
-			<dt class="text-xs mt-2">Average paid:</dt>
-			<dd class="text-right">
-				<span class="badge variant-filled-tertiary"><Usd value={average} /></span>
-			</dd>
-		{/if}
-	</dl>
 </section>
+
+
+<style lang="postcss">
+	dt {
+		@apply text-sm whitespace-nowrap text-ellipsis overflow-hidden;
+	}
+</style>

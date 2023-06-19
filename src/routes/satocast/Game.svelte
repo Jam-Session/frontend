@@ -74,7 +74,7 @@
 	$: gameOver = progress >= 1;
 </script>
 
-<div class="flex flex-col gap-4flex-1 h-full overflow-hidden">
+<div class="flex flex-col h-full">
 	<div class="p-4 flex w-full items-baseline gap-4">
 		<div class="basis-1/3 whitespace-nowrap">
 			<p class={`badge ${gameOver ? 'variant-ringed-tertiary' : 'variant-filled-primary'}`}>
@@ -93,11 +93,11 @@
 		</div>
 	</div>
 
-	<div class="basis-1/3 border-t">
+	<div class="basis-1/2 border-t">
 		<Chart data={candlesticks} />
 	</div>
 
-	<div class="flex gap-4 p-4 flex-1">
+	<div class="flex gap-4 p-4 items-start">
 		<Player name={strategy.name} {price} {when} buy={strategy.buy} {budget} />
 		<Player name="Player" {price} {when} {budget} {gameOver} />
 	</div>
