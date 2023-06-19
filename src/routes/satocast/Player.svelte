@@ -70,14 +70,14 @@
 		{/if}
 	</div>
 
-	<ol class="flex flex-col-reverse w-full text-xs font-mono whitespace-nowrap text-right">
+	<ol class="flex flex-col-reverse w-full text-xs font-mono whitespace-nowrap">
 		{#each purchases as purchase}
 			{@const btcAmount = purchase.satAmount / 1e8}
 			<li class="variant-soft-surface px-1 gap-2 mb-px flex" in:fade>
 				<time datetime={formatISO(purchase.when)} class="basis-1/3 text-ellipsis overflow-hidden"
 					>{format(purchase.when, 'p')}</time
 				>
-				<span class="flex-1 font-bold">
+				<span class="flex-1 font-bold text-right">
 					<span class="hidden md:inline font-normal"><Usd value={purchase.usdAmount} /> =</span>
 					<Btc value={btcAmount} options={{ minimumFractionDigits: 8 }} />
 				</span>
