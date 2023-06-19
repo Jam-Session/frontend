@@ -38,11 +38,9 @@ export async function load() {
 
 	const allPrices = bars.reduce<number[]>((a, b) => [...a, ...b.prices], []);
 	const average = allPrices.reduce((a, p) => a + p, 0) / allPrices.length;
-	const budget = 1e4;
 
 	return {
 		bars,
-		average,
-		budget 
+		average
 	};
 }

@@ -15,6 +15,7 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
+	export let budget: number;
 	export let type: string;
 
 	const progressMax = (data.bars.length - 1) * 60;
@@ -45,7 +46,7 @@
 			} else {
 				clearInterval(interval);
 			}
-		}, 100);
+		}, 20);
 		return () => clearInterval(interval);
 	});
 
@@ -73,18 +74,28 @@
 	$: gameOver = progress >= 1;
 </script>
 
-<div class="flex flex-col gap-4 items-center">
-	<p class={`badge ${gameOver ? 'variant-ringed-tertiary' : 'variant-filled-primary'}`}>
-		{format(when, 'PPppp')}
-	</p>
-	<progress value={progress} />
-	<Chart data={candlesticks} />
-	<div class="flex w-full gap-4">
-		<div class="flex-1">
-			<Player name={strategy.name} {price} {when} buy={strategy.buy} budget={data.budget} />
+<div class="flex flex-col gap-4flex-1 h-full overflow-hidden">
+	<div class="p-4 flex w-full items-baseline gap-4">
+		<div class="basis-1/3 whitespace-nowrap">
+			<p class={`badge ${gameOver ? 'variant-ringed-tertiary' : 'variant-filled-primary'}`}>
+				{format(when, 'PP p')}
+			</p>
 		</div>
 		<div class="flex-1">
-			<Player name="Player" {price} {when} budget={data.budget} {gameOver} />
+			{#if gameOver}
+				<p class="text-right font-bold">GAME OVER!</p>
+			{:else}
+				<progress value={progress} />
+			{/if}
 		</div>
+	</div>
+
+	<div class="basis-1/3 border-t">
+		<Chart data={candlesticks} />
+	</div>
+
+	<div class="flex gap-4 p-4 flex-1">
+		<Player name={strategy.name} {price} {when} buy={strategy.buy} {budget} />
+		<Player name="Player" {price} {when} {budget} {gameOver} />
 	</div>
 </div>

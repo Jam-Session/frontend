@@ -54,4 +54,4 @@
 	$: update(data);
 </script>
 
-<object aria-label="Chart" bind:this={el} class="h-[40dvh] w-full" />
+<object aria-label="Chart" bind:this={el} class="w-full h-full" />

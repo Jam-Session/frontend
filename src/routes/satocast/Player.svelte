@@ -53,55 +53,57 @@
 	$: average = (budget - balance) / (totalSats / 1e8);
 </script>
 
-<h2 class="border-b mb-2">{name}</h2>
+<section class="basis-1/2 flex flex-col items-center">
+	<h2 class="border-b mb-2 w-full">{name}</h2>
 
-<dl class="grid grid-cols-2 gap-x-4 mb-2 items-baseline">
-	<dt class="text-xs">Fiat balance:</dt>
-	<dd class="text-right">
-		<span class="badge variant-glass-tertiary"><Usd value={balance} /></span>
-	</dd>
-	<dt class="text-xs">Amount stacked:</dt>
-	<dd class="text-right">
-		<span class="badge variant-glass-secondary"><Btc value={totalSats / 1e8} /></span>
-	</dd>
-	{#if !isNaN(average)}
-		<dt class="text-xs">Average paid:</dt>
-		<dd class="text-right">
-			<span class="badge variant-ghost-primary"><Usd value={average} /></span>
-		</dd>
+	{#if !buy && !gameOver}
+		<div class="flex flex-row-reverse gap-2 items-start justify-between mb-2 w-full">
+			<button
+				class="btn variant-filled-secondary"
+				on:click={handleBuyClick}
+				disabled={balance <= 0}>Buy</button
+			>
+
+			<label class="flex-1">
+				<span class="block text-xs">
+					<Usd value={amount} /> &approx; <Btc
+						value={amount / price}
+						options={{ maximumSignificantDigits: 4, minimumSignificantDigits: 4 }}
+					/>
+				</span>
+				<input type="range" min={1} max={balance} bind:value={amount} />
+			</label>
+		</div>
 	{/if}
-</dl>
 
-{#if !buy && !gameOver}
-	<div class="flex gap-2 items-start justify-between mb-2">
-		<button
-			class="btn variant-filled-secondary btn-sm"
-			on:click={handleBuyClick}
-			disabled={balance <= 0}>Buy</button
-		>
+	<ol class="text-xs max-h-[20dvh] overflow-auto flex flex-col w-full">
+		{#each purchases as purchase}
+			<li class="variant-soft-surface p-2 mt-px sm:flex sm:items-center" use:scrollTo in:fade>
+				<span>
+					<Usd value={purchase.usdAmount} /> @
+					<time datetime={formatISO(purchase.when)}>{format(purchase.when, 'p')}</time>
+				</span>
+				<div class="sm:flex-1 sm:ml-2 text-right">
+					<Btc value={purchase.satAmount / 1e8} />
+				</div>
+			</li>
+		{/each}
+	</ol>
 
-		<label class="flex-1">
-			<span class="block text-xs">
-				<Usd value={amount} /> &approx; <Btc
-					value={amount / price}
-					options={{ maximumSignificantDigits: 4, minimumSignificantDigits: 4 }}
-				/>
-			</span>
-			<input type="range" min={1} max={balance} bind:value={amount} />
-		</label>
-	</div>
-{/if}
-
-<ol class="text-sm max-h-40 overflow-auto">
-	{#each purchases as purchase}
-		<li class="flex items-center variant-soft-surface p-2 mt-px" use:scrollTo in:fade>
-			<span class="text-xs">
-				<Usd value={purchase.usdAmount} /> @
-				<time datetime={formatISO(purchase.when)}>{format(purchase.when, 'p')}</time>
-			</span>
-			<span class="flex-1 ml-2 text-right">
-				<Btc value={purchase.satAmount / 1e8} />
-			</span>
-		</li>
-	{/each}
-</ol>
+	<dl class="w-full sm:w-auto sm:inline-grid grid-cols-2 my-2 items-baseline">
+		<dt class="text-xs">Fiat balance:</dt>
+		<dd class="text-right">
+			<span class="badge variant-glass-warning"><Usd value={balance} /></span>
+		</dd>
+		<dt class="text-xs mt-2">Amount stacked:</dt>
+		<dd class="text-right">
+			<span class="badge variant-ringed"><Btc value={totalSats / 1e8} /></span>
+		</dd>
+		{#if !isNaN(average)}
+			<dt class="text-xs mt-2">Average paid:</dt>
+			<dd class="text-right">
+				<span class="badge variant-filled-tertiary"><Usd value={average} /></span>
+			</dd>
+		{/if}
+	</dl>
+</section>
