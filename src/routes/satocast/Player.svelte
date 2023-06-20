@@ -12,6 +12,8 @@
 	export let price = 0;
 	export let gameOver = false;
 
+	export let totalSats = 0;
+
 	type Purchase = {
 		when: Date;
 		usdAmount: number;
@@ -20,14 +22,18 @@
 
 	let purchases: Purchase[] = [];
 	let balance = budget;
+	let average = NaN;
 
 	function doPurchase(usdAmount: number) {
 		if (balance > 0 && usdAmount <= balance) {
 			balance -= usdAmount;
+			const satAmount = Math.floor((usdAmount / price) * 1e8);
 			purchases = [
 				...purchases,
-				{ when, usdAmount, satAmount: Math.floor((usdAmount / price) * 1e8) }
+				{ when, usdAmount, satAmount }
 			];
+			totalSats += satAmount;
+			average = (budget - balance) / (totalSats / 1e8);
 		}
 	}
 
@@ -38,10 +44,7 @@
 		}
 	}
 
-	$: maybeBuy(when);
-	$: gameOver && doPurchase(balance);
-	$: totalSats = purchases.reduce((a, p) => a + p.satAmount, 0);
-	$: average = (budget - balance) / (totalSats / 1e8);
+	$: gameOver ? doPurchase(balance) : maybeBuy(when);
 </script>
 
 <section class="basis-1/2 flex flex-col items-start">
@@ -49,10 +52,12 @@
 
 	<div class="flex my-2 gap-2 items-start justify-between w-full">
 		<dl class="grid gap-x-2 grid-cols-[auto_1fr] items-baseline">
-			<dt>Fiat balance:</dt>
-			<dd>
-				<span class="badge variant-glass-warning"><Usd value={balance} /></span>
-			</dd>
+			{#if !gameOver}
+				<dt>Fiat balance:</dt>
+				<dd>
+					<span class="badge variant-glass-warning"><Usd value={balance} /></span>
+				</dd>
+			{/if}
 			<dt>Amount stacked:</dt>
 			<dd>
 				<span class="badge variant-ringed"><Btc value={totalSats / 1e8} /></span>

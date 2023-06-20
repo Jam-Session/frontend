@@ -13,6 +13,7 @@
 	import Player from './Player.svelte';
 	import type { CandlestickData, UTCTimestamp } from 'lightweight-charts';
 	import type { PageData } from './$types';
+	import { fly } from 'svelte/transition';
 
 	export let data: PageData;
 	export let budget: number;
@@ -69,22 +70,43 @@
 		];
 	}, []);
 
+	let botSats = 0;
+	let playerSats = 0;
+
 	$: progress = (hour * 60 + getMinutes(when)) / progressMax;
 	$: price = candlesticks[candlesticks.length - 1].close;
 	$: gameOver = progress >= 1;
+	$: ratio = playerSats / botSats;
 </script>
 
 <div class="flex flex-col h-full">
 	<div class="p-4 flex w-full items-baseline gap-4">
 		<div class="basis-1/3 whitespace-nowrap">
-			<p class={`badge ${gameOver ? 'variant-ringed-tertiary' : 'variant-filled-primary'}`}>
+			<span class={`badge ${gameOver ? 'variant-ringed-tertiary' : 'variant-filled-primary'}`}>
 				{format(when, 'PP p')}
-			</p>
+			</span>
 		</div>
 		<div class="flex-1">
 			{#if gameOver}
-				<p class="text-right">
-					<strong>GAME OVER!</strong>
+				<p class="text-right" in:fly={{x: -100}}>
+					{#if ratio > 1}
+					 🏆 Player stacked
+						<strong
+							>{(ratio - 1).toLocaleString(undefined, {
+								style: 'percent',
+								minimumFractionDigits: 2
+							})}</strong
+						>
+					{:else}
+					🤦 {strategy.name} stacked
+					<strong
+						>{((1/ratio)-1).toLocaleString(undefined, {
+							style: 'percent',
+							minimumFractionDigits: 2
+						})}</strong
+					>
+					{/if}
+					more - 
 					<a href="/satocast" class="anchor">try again</a>
 				</p>
 			{:else}
@@ -98,7 +120,15 @@
 	</div>
 
 	<div class="flex gap-4 p-4 items-start">
-		<Player name={strategy.name} {price} {when} buy={strategy.buy} {budget} />
-		<Player name="Player" {price} {when} {budget} {gameOver} />
+		<Player
+			name={strategy.name}
+			{price}
+			{when}
+			{gameOver}
+			buy={strategy.buy}
+			{budget}
+			bind:totalSats={botSats}
+		/>
+		<Player name="Player" {price} {when} {budget} {gameOver} bind:totalSats={playerSats} />
 	</div>
 </div>

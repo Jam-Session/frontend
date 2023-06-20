@@ -17,10 +17,15 @@
 {#if type}
 	<Game {data} {type} {budget} />
 {:else}
-	<div class="flex flex-col sm:flex-row gap-4 items-start justify-between p-4">
-		<p class="badge variant-ringed-primary">
-			{format(start, 'PPppp')}
-		</p>
+	<div class="flex flex-col sm:flex-row gap-4 items-baseline justify-between p-4">
+		<div>
+			<span class="badge variant-ringed-primary">{format(start, 'PPppp')}</span>
+			<a
+				data-sveltekit-reload
+				href="?{format(start, 't')}"
+				class="anchor text-xs ml-1">reload</a
+			>
+		</div>
 		<p class="text-sm">
 			Average price over {data.bars.length} hour period: <em><Usd value={data.average} /></em>
 		</p>
