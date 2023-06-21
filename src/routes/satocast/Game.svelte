@@ -80,40 +80,38 @@
 </script>
 
 <div class="flex flex-col h-full">
-	<div class="p-4 flex w-full items-baseline gap-4">
-		<div class="basis-1/3 whitespace-nowrap">
-			<span class={`badge ${gameOver ? 'variant-ringed-tertiary' : 'variant-filled-primary'}`}>
-				{format(when, 'PP p')}
-			</span>
-		</div>
-		<div class="flex-1">
-			{#if gameOver}
-				<p class="text-right" in:fly={{x: -100}}>
-					{#if ratio > 1}
-					 🏆 Player stacked
-						<strong
-							>{(ratio - 1).toLocaleString(undefined, {
-								style: 'percent',
-								minimumFractionDigits: 2
-							})}</strong
-						>
-					{:else}
-					🤦 {strategy.name} stacked
-					<strong
-						>{((1/ratio)-1).toLocaleString(undefined, {
-							style: 'percent',
-							minimumFractionDigits: 2
-						})}</strong
-					>
-					{/if}
-					more - 
-					<a href="/satocast" class="anchor">try again</a>
-				</p>
+	{#if gameOver}
+		<p class="p-4" in:fly={{ x: -100 }}>
+			{#if ratio > 1}
+				🏆 Player stacked
+				<strong
+					>{(ratio - 1).toLocaleString(undefined, {
+						style: 'percent',
+						minimumFractionDigits: 2
+					})}</strong
+				>
 			{:else}
-				<progress value={progress} />
+				🤦 {strategy.name} stacked
+				<strong
+					>{(1 / ratio - 1).toLocaleString(undefined, {
+						style: 'percent',
+						minimumFractionDigits: 2
+					})}</strong
+				>
 			{/if}
+			more -
+			<a href="/satocast" class="anchor">try again</a>
+		</p>
+	{:else}
+		<div class="p-4 flex w-full items-baseline justify-between gap-4">
+			<div class="basis-3/4">
+				<span class={`badge ${gameOver ? 'variant-ringed-tertiary' : 'variant-filled-primary'}`}>
+					{format(when, 'PP p')}
+				</span>
+			</div>
+			<progress value={progress} />
 		</div>
-	</div>
+	{/if}
 
 	<div class="basis-1/2 border-t">
 		<Chart data={candlesticks} />

@@ -26,7 +26,7 @@
 
 	function setbudget() {
 		const position = parseInt(logslider.value, 10);
-		budget = Math.exp(minv + scale * (position - minp));
+		budget = Math.floor(Math.exp(minv + scale * (position - minp)));
 	}
 
 	onMount(() => {

@@ -4,6 +4,8 @@
 	export let doPurchase: (n: number) => void;
 	export let balance = 0;
 
+	console.log(balance.toString());
+
 	let btns = balance
 		.toString()
 		.split('')
