@@ -25,7 +25,7 @@
 	let average = NaN;
 
 	function doPurchase(usdAmount: number) {
-		if (balance > 0 && usdAmount <= balance) {
+		if (balance > 0 && usdAmount <= balance && price > 0) {
 			balance -= usdAmount;
 			const satAmount = Math.floor((usdAmount / price) * 1e8);
 			purchases = [
