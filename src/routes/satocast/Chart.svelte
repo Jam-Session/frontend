@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import {
 		createChart,
 		type ISeriesApi,
@@ -8,7 +8,8 @@
 		type CandlestickData
 	} from 'lightweight-charts';
 	import { browser } from '$app/environment';
-	import { format, fromUnixTime, getUnixTime } from 'date-fns';
+	import { format, fromUnixTime } from 'date-fns';
+	import { modeCurrent } from '@skeletonlabs/skeleton';
 
 	export let data: CandlestickData[];
 
@@ -40,6 +41,33 @@
 			});
 			series = chart.addCandlestickSeries();
 			series.setData(data);
+
+			return modeCurrent.subscribe(async (lightMode) => {
+				await tick();
+				const s = getComputedStyle(el);
+				function rgba(cssvar: string) {
+					return `rgba(${s.getPropertyValue(cssvar)})`;
+				}
+				const gridColor = rgba(lightMode ? '--color-surface-300' : '--color-surface-800');
+				const textColor = rgba(lightMode ? '--theme-font-color-base' : '--theme-font-color-dark');
+				const borderColor = s.getPropertyValue('border-color');
+				chart.applyOptions({
+					layout: {
+						background: { color: 'transparent' },
+						textColor
+					},
+					rightPriceScale: {
+						borderColor
+					},
+					timeScale: {
+						borderColor
+					},
+					grid: {
+						vertLines: { color: gridColor },
+						horzLines: { color: gridColor }
+					}
+				});
+			});
 		});
 	}
 
