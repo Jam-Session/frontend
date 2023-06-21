@@ -81,7 +81,7 @@
 
 <div class="flex flex-col h-full">
 	{#if gameOver}
-		<p class="p-4" in:fly={{ x: -100 }}>
+		<p class="p-4 text-center" in:fly={{ x: -100 }}>
 			{#if ratio > 1}
 				🏆 Player stacked
 				<strong
