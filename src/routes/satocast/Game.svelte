@@ -104,10 +104,11 @@
 		</p>
 	{:else}
 		<div class="p-4 flex w-full items-baseline justify-between gap-4">
-			<div class="basis-3/4">
-				<span class={`badge ${gameOver ? 'variant-ringed-tertiary' : 'variant-filled-primary'}`}>
-					{format(when, 'PP p')}
-				</span>
+			<span class="badge variant-filled-primary">
+				{format(when, 'PP')}
+			</span>
+			<div class="text-center basis-40 badge">
+				candle {hour + 1} of {data.bars.length}
 			</div>
 			<progress value={progress} />
 		</div>
