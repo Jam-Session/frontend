@@ -107,10 +107,10 @@
 			<span class="badge variant-filled-primary">
 				{format(when, 'PP')}
 			</span>
-			<div class="text-center basis-40 badge">
+			<progress value={progress} class="basis-3/4" />
+			<strong class="text-xs whitespace-nowrap">
 				candle {hour + 1} of {data.bars.length}
-			</div>
-			<progress value={progress} />
+			</strong>
 		</div>
 	{/if}
 
