@@ -2,7 +2,7 @@
 	import Btc from '$lib/Btc.svelte';
 	import Usd from '$lib/Usd.svelte';
 	import { format, formatISO } from 'date-fns';
-	import { fade } from 'svelte/transition';
+	import { fade, fly } from 'svelte/transition';
 	import BuyBtns from './BuyBtns.svelte';
 
 	export let name: string;
@@ -28,10 +28,7 @@
 		if (balance > 0 && usdAmount <= balance && price > 0) {
 			balance -= usdAmount;
 			const satAmount = Math.floor((usdAmount / price) * 1e8);
-			purchases = [
-				...purchases,
-				{ when, usdAmount, satAmount }
-			];
+			purchases = [...purchases, { when, usdAmount, satAmount }];
 			totalSats += satAmount;
 			average = (budget - balance) / (totalSats / 1e8);
 		}
@@ -50,30 +47,24 @@
 <section class="basis-1/2 flex flex-col items-start">
 	<h2 class="border-b w-full">{name}</h2>
 
-	<div class="flex my-2 gap-2 items-start justify-between w-full">
-		<dl class="grid gap-x-2 grid-cols-[auto_1fr] items-baseline">
-			{#if !gameOver}
-				<dt>Fiat balance:</dt>
-				<dd>
-					<span class="badge variant-glass-warning"><Usd value={balance} /></span>
-				</dd>
-			{/if}
-			<dt>Amount stacked:</dt>
+	<dl class="grid gap-x-2 grid-cols-[auto_1fr] items-baseline my-2">
+		{#if !gameOver}
+			<dt>Fiat balance:</dt>
 			<dd>
-				<span class="badge variant-ringed"><Btc value={totalSats / 1e8} /></span>
+				<span class="badge variant-glass-warning"><Usd value={balance} /></span>
 			</dd>
-			{#if !isNaN(average)}
-				<dt>Average paid:</dt>
-				<dd>
-					<span class="badge variant-filled-tertiary"><Usd value={average} /></span>
-				</dd>
-			{/if}
-		</dl>
-
-		{#if !buy && !gameOver}
-			<BuyBtns {doPurchase} {balance} />
 		{/if}
-	</div>
+		<dt>Amount stacked:</dt>
+		<dd>
+			<span class="badge variant-ringed"><Btc value={totalSats / 1e8} /></span>
+		</dd>
+		{#if !isNaN(average)}
+			<dt>Average paid:</dt>
+			<dd>
+				<span class="badge variant-filled-tertiary"><Usd value={average} /></span>
+			</dd>
+		{/if}
+	</dl>
 
 	<ol class="flex flex-col-reverse w-full text-xs font-mono whitespace-nowrap">
 		{#each purchases as purchase}
@@ -90,6 +81,15 @@
 		{/each}
 	</ol>
 </section>
+
+{#if !buy && !gameOver}
+	<div class="fixed card top-32 left-1/2 z-10 -translate-x-1/2" out:fly={{ y: -50 }}>
+		<h5 class="card-header text-center leading-none">Buy now!</h5>
+		<div class="p-4">
+			<BuyBtns {doPurchase} {balance} />
+		</div>
+	</div>
+{/if}
 
 <style lang="postcss">
 	dt {

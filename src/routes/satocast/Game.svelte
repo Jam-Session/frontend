@@ -35,21 +35,22 @@
 
 	let hour = 0;
 	let when = data.bars[hour].start;
+	let speed = 1;
 
-	onMount(() => {
-		const interval = setInterval(() => {
-			const next = data.bars.at(hour + 1);
-			if (next) {
-				when = addMinutes(when, 1);
-				if (!isBefore(when, next.start)) {
-					hour += 1;
-				}
-			} else {
-				clearInterval(interval);
+	function loop() {
+		const next = data.bars.at(hour + 1);
+		if (next) {
+			when = addMinutes(when, 1);
+			if (!isBefore(when, next.start)) {
+				hour += 1;
 			}
-		}, 42);
-		return () => clearInterval(interval);
-	});
+			const delay = Math.min(20 / Math.log(speed), 42);
+			setTimeout(loop, delay);
+			console.log(delay)
+		}
+	}
+
+	onMount(loop);
 
 	$: candlesticks = data.bars.reduce<CandlestickData[]>((memo, bar, index) => {
 		const time = getUnixTime(bar.start) as UTCTimestamp;
@@ -111,6 +112,7 @@
 			<strong class="text-xs whitespace-nowrap">
 				candle {hour + 1} of {data.bars.length}
 			</strong>
+			<input class="w-24 translate-y-1" bind:value={speed} type="range" min={1} max={10} step={1} />
 		</div>
 	{/if}
 
@@ -118,7 +120,9 @@
 		<Chart data={candlesticks} />
 	</div>
 
-	<div class="flex gap-4 p-4 items-start">
+	<div class="flex flex-col gap-4 p-4">
+		<Player name="Player" {price} {when} {budget} {gameOver} bind:totalSats={playerSats} />
+
 		<Player
 			name={strategy.name}
 			{price}
@@ -128,6 +132,5 @@
 			{budget}
 			bind:totalSats={botSats}
 		/>
-		<Player name="Player" {price} {when} {budget} {gameOver} bind:totalSats={playerSats} />
 	</div>
 </div>
