@@ -35,7 +35,11 @@
 
 	let hour = 0;
 	let when = data.bars[hour].start;
-	let speed = 1;
+	let speed = 22;
+
+	function getEmoji(s: number) {
+		return s > 40 ? '🏎️' : s > 30 ? '🚴' : s > 20 ? '🏃🏻‍♂️' : s > 10 ? '🚶🏻' : '🐌';
+	}
 
 	function loop() {
 		const next = data.bars.at(hour + 1);
@@ -44,9 +48,7 @@
 			if (!isBefore(when, next.start)) {
 				hour += 1;
 			}
-			const delay = Math.min(20 / Math.log(speed), 42);
-			setTimeout(loop, delay);
-			console.log(delay)
+			setTimeout(loop, (1 / speed) * 420);
 		}
 	}
 
@@ -112,7 +114,17 @@
 			<strong class="text-xs whitespace-nowrap">
 				candle {hour + 1} of {data.bars.length}
 			</strong>
-			<input class="w-24 translate-y-1" bind:value={speed} type="range" min={1} max={10} step={1} />
+			<input
+				class="w-24 translate-y-1"
+				bind:value={speed}
+				type="range"
+				min={2}
+				max={42}
+				step={10}
+			/>
+			<span>
+				{getEmoji(speed)}
+			</span>
 		</div>
 	{/if}
 
