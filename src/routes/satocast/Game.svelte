@@ -9,6 +9,7 @@
 		isEqual,
 		isSameHour
 	} from 'date-fns';
+	import { Howl } from 'howler';
 	import Chart from './Chart.svelte';
 	import Player from './Player.svelte';
 	import type { CandlestickData, UTCTimestamp } from 'lightweight-charts';
@@ -41,6 +42,14 @@
 		return s > 40 ? '🏎️' : s > 30 ? '🚴' : s > 20 ? '🏃🏻‍♂️' : s > 10 ? '🚶🏻' : '🐌';
 	}
 
+	const openSound = new Howl({
+		src: ['open-444547.mp3']
+	});
+
+	const overSound = new Howl({
+		src: ['over-530662.mp3']
+	});
+
 	function loop() {
 		const next = data.bars.at(hour + 1);
 		if (next) {
@@ -50,9 +59,15 @@
 			}
 			setTimeout(loop, (1 / speed) * 420);
 		}
+		else {
+			overSound.play();
+		}
 	}
 
-	onMount(loop);
+	onMount(() => {
+		openSound.play();
+		loop();
+	});
 
 	$: candlesticks = data.bars.reduce<CandlestickData[]>((memo, bar, index) => {
 		const time = getUnixTime(bar.start) as UTCTimestamp;
