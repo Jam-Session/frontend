@@ -82,7 +82,7 @@
 	</ol>
 </section>
 
-{#if !buy && !gameOver}
+{#if !buy && balance > 0}
 	<div class="fixed card shadow-lg top-32 left-1/2 z-10 -translate-x-1/2" out:fly={{ y: -50 }}>
 		<h5 class="card-header text-center leading-none">Buy now!</h5>
 		<div class="p-4">

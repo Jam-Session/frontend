@@ -9,12 +9,12 @@
 		isEqual,
 		isSameHour
 	} from 'date-fns';
-	import { Howl } from 'howler';
 	import Chart from './Chart.svelte';
 	import Player from './Player.svelte';
 	import type { CandlestickData, UTCTimestamp } from 'lightweight-charts';
 	import type { PageData } from './$types';
 	import { fly } from 'svelte/transition';
+	import Sound from '$lib/Sound.svelte';
 
 	export let data: PageData;
 	export let budget: number;
@@ -42,14 +42,6 @@
 		return s > 40 ? '🏎️' : s > 30 ? '🚴' : s > 20 ? '🏃🏻‍♂️' : s > 10 ? '🚶🏻' : '🐌';
 	}
 
-	const openSound = new Howl({
-		src: ['open-444547.mp3']
-	});
-
-	const overSound = new Howl({
-		src: ['over-530662.mp3']
-	});
-
 	function loop() {
 		const next = data.bars.at(hour + 1);
 		if (next) {
@@ -59,15 +51,9 @@
 			}
 			setTimeout(loop, (1 / speed) * 420);
 		}
-		else {
-			overSound.play();
-		}
 	}
 
-	onMount(() => {
-		openSound.play();
-		loop();
-	});
+	onMount(loop);
 
 	$: candlesticks = data.bars.reduce<CandlestickData[]>((memo, bar, index) => {
 		const time = getUnixTime(bar.start) as UTCTimestamp;
@@ -97,10 +83,12 @@
 	$: ratio = playerSats / botSats;
 </script>
 
+<Sound src="/sounds/open.mp3" />
 <div class="flex flex-col h-full">
 	{#if gameOver}
 		<p class="p-4 text-center" in:fly={{ x: -100 }}>
 			{#if ratio > 1}
+				<Sound src="/sounds/win.mp3" />
 				🏆 Player stacked
 				<strong
 					>{(ratio - 1).toLocaleString(undefined, {
@@ -109,6 +97,7 @@
 					})}</strong
 				>
 			{:else}
+				<Sound src="/sounds/loss.mp3" />
 				🤦 {strategy.name} stacked
 				<strong
 					>{(1 / ratio - 1).toLocaleString(undefined, {

@@ -13,7 +13,7 @@
 		.slice(-3);
 
 	const sound = new Howl({
-		src: ['cash-28020.mp3']
+		src: ['/sounds/cash.mp3']
 	});
 
 	function handleClick(amount: number) {
