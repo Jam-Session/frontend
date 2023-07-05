@@ -88,7 +88,7 @@
 	{#if gameOver}
 		<p class="p-4 text-center" in:fly={{ x: -100 }}>
 			{#if ratio > 1}
-				<Sound src="/sounds/win.mp3" />
+				<Sound src="/sounds/congrats.mp3" />
 				🏆 Player stacked
 				<strong
 					>{(ratio - 1).toLocaleString(undefined, {
