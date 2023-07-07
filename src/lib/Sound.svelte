@@ -1,9 +1,12 @@
 <script lang="ts">
-  import { Howl } from 'howler';
+	import { Howl } from 'howler';
+	import { onMount } from 'svelte';
 
-  export let src = '';
+	export let src = '';
 
-  if (src) {
-    new Howl({ src, autoplay: true });
-  }
+	onMount(() => {
+		if (src) {
+			new Howl({ src, autoplay: true });
+		}
+	});
 </script>

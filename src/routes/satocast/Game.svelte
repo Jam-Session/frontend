@@ -86,9 +86,9 @@
 <Sound src="/sounds/open.mp3" />
 <div class="flex flex-col h-full">
 	{#if gameOver}
+		<Sound src={`/sounds/${ratio > 1 ? 'congrats' : 'loss'}.mp3`} />
 		<p class="p-4 text-center" in:fly={{ x: -100 }}>
 			{#if ratio > 1}
-				<Sound src="/sounds/congrats.mp3" />
 				🏆 Player stacked
 				<strong
 					>{(ratio - 1).toLocaleString(undefined, {
@@ -97,7 +97,6 @@
 					})}</strong
 				>
 			{:else}
-				<Sound src="/sounds/loss.mp3" />
 				🤦 {strategy.name} stacked
 				<strong
 					>{(1 / ratio - 1).toLocaleString(undefined, {
@@ -123,8 +122,7 @@
 				bind:value={speed}
 				type="range"
 				min={2}
-				max={42}
-				step={10}
+				max={99}
 			/>
 			<span>
 				{getEmoji(speed)}
